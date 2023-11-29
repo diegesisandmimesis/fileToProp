@@ -9,7 +9,7 @@
 // USAGE
 //
 //	This will load the contents of a file called "fileName.txt" as
-//	as a string, and setting the value of someObject.someProp to be
+//	a string, and setting the value of someObject.someProp to be
 //	the result.
 //
 //		someObject: object
