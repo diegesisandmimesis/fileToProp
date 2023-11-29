@@ -2,6 +2,29 @@
 //
 // fileToProp.t
 //
+//	A simple TADS3 module for loading the contents of a file during
+//	preinit and assigning the contents to a property on an object.
+//
+//
+// USAGE
+//
+//	This will load the contents of a file called "fileName.txt" as
+//	as a string, and setting the value of someObject.someProp to be
+//	the result.
+//
+//		someObject: object
+//			someProp = nil
+//		;
+//		+FileToProp 'fileName.txt' ->(&someProp);
+//
+//	The file path is relative to the default location checked for by
+//	the compiler, which by default will be the directory the compiled
+//	story file will end up in.
+//
+//	The file has to be present at preinit but not at runtime (except
+//	for debugging builds, where preinit occurs at runtime).
+//
+//
 #include <adv3.h>
 #include <en_us.h>
 
