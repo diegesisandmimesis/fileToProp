@@ -24,10 +24,21 @@
 
 versionInfo: GameID;
 gameMain: GameMainDef
-	foozle = nil
+	textString = nil
+	loadedList = nil
 
 	newGame() {
-		"\nFoozle:\n<<toString(foozle)>>\n ";
+		"\ntextString:  <<toString(textString)>>\n ";
+		"<.p> ";
+		"\nloadedList:  ";
+		if(loadedList.ofKind(List)) {
+			loadedList.forEach(function(o) {
+				"\n\t<<toString(o)>>\n ";
+			});
+		} else {
+			"NOT LIST\n ";
+		}
 	}
 ;
-+FileToProp 'file.txt' ->(&foozle);
++FileToProp 'text.txt' ->(&textString);
++FileToListInt 'poker.txt' ->(&loadedList);

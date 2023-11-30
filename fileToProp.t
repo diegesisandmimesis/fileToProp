@@ -25,6 +25,32 @@
 //	for debugging builds, where preinit occurs at runtime).
 //
 //
+// SUBCLASSES
+//
+//	The base FileToProp class treats the file contents as a string.
+//
+//	FileToString is a subclass of FileToProp that does the same thing,
+//	and is included in case you want to be explicit about the data type.
+//
+//	FileToListInt treats the file contents as a comma-separated array of
+//	integers.  The file format should be something like:
+//
+//		1, 2, 3
+//
+//	...or, equivalently...
+//
+//		1,
+//		2,
+//		3
+//
+//	In general whitespace will be ignored.
+//
+//	FileToListString is similar, but creates an array of strings.
+//
+//	FileToListInt and FileToListString don't do anything special to
+//	validate data, so it's up to you to make sure the files are
+//	properly formatted.
+//
 #include <adv3.h>
 #include <en_us.h>
 
@@ -36,14 +62,26 @@ fileToPropModuleID: ModuleID {
         listingOrder = 99
 }
 
+
+// Singleton preinit object that handles polling all the FileToProp
+// instances.
 fileToProp: PreinitObject
 	execute() {
 		_preinitFileToProp();
 	}
 
+	// Ping each FileToProp instance.
+	_preinitFileToProp() {
+		forEachInstance(FileToProp, function(o) {
+			o.initializeFileToProp();
+		});
+	}
+
+	// Little debugging method.
 	_error(msg) { aioSay('\nFileToProp error:  <<msg>>\n '); }
 
-	_fileToString(fname) {
+	// Load the given file and return a string containing the contents.
+	fileToString(fname) {
 		local buf, fileHandle, line;
 
 		try {
@@ -58,11 +96,14 @@ fileToProp: PreinitObject
 				buf.append(line);
 				line = fileHandle.readFile();
 			}
+
 			fileHandle.closeFile();
 		}
+
 		catch(Exception e) {
 			_error('<<fname>>:  File load failed:', e);
 		}
+
 		finally {
 			if(buf != nil)
 				return(toString(buf));
@@ -70,34 +111,64 @@ fileToProp: PreinitObject
 				return(nil);
 		}
 	}
+;
 
-	fileToProperty(obj, prop, fname) {
-		local v;
+// Object defining the file to load and the property to assign the contents
+// to.
+FileToProp: object
+	fname = nil		// file name
+	prop = nil		// object property
 
-		if((v = _fileToString(fname)) == nil) {
-			_error('failed to read file <<fname>>');
-			return(nil);
-		}
-		(obj).(prop) = v;
-		return(true);
+	initializeFileToProp() {
+		local buf;
+
+		// Make sure we have a filename and a property to use.
+		if((fname == nil) || (prop == nil))
+			return;
+
+		// Make sure we're declared "inside" another object, so
+		// we an object to set the property on.
+		if(location == nil)
+			return;
+
+		// Try to load the contents.  The contents of buf
+		// will be a string or nil.
+		if((buf = fileToProp.fileToString(fname)) == nil)
+			return;
+
+		// Set the property.
+		setProperty(buf);
 	}
 
-	_preinitFileToProp() {
-		forEachInstance(FileToProp, function(o) {
-			o.initializeFileToProp();
-		});
+	// By default we just assign the value to the property, which
+	// will leave the property a string.
+	setProperty(v) { (location).(prop) = v; }
+;
+
+// Our default behavior is to treat the file contents as a string, so
+// FileToString is just an alias for the base FileToProp class.
+FileToString: FileToProp;
+
+// FileToProp subclass that treats the file contents as an array of integers.
+FileToListInt: FileToProp
+	setProperty(data) {
+		local l, v;
+
+		l = data.split(',');
+		v = new Vector(l.length);
+		l.forEach(function(o) { v.append(toInteger(o)); });
+		(location).(prop) = v.toList();
 	}
 ;
 
-FileToProp: object
-	fname = nil
-	prop = nil
+// As above, but treat the file contents as an array of strings.
+FileToListString: FileToProp
+	setProperty(data) {
+		local l, v;
 
-	initializeFileToProp() {
-		if((fname == nil) || (prop == nil))
-			return;
-		if(location == nil)
-			return;
-		fileToProp.fileToProperty(location, prop, fname);
+		l = data.split(',');
+		v = new Vector(l.length);
+		l.forEach(function(o) { v.append(toString(o)); });
+		(location).(prop) = v.toList();
 	}
 ;

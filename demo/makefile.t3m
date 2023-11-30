@@ -6,3 +6,4 @@
 -lib adv3/adv3
 -lib ../fileToProp
 -source src/sample.t
+-source dynfunc.t
