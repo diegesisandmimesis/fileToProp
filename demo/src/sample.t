@@ -41,4 +41,4 @@ gameMain: GameMainDef
 	}
 ;
 +FileToProp 'text.txt' ->(&textString);
-+FileToListInt 'poker.txt' ->(&loadedList);
++FileToListInt 'list.txt' ->(&loadedList);
