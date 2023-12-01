@@ -77,9 +77,6 @@ fileToProp: PreinitObject
 		});
 	}
 
-	// Little debugging method.
-	_error(msg) { aioSay('\nFileToProp error:  <<msg>>\n '); }
-
 	// Load the given file and return a string containing the contents.
 	fileToString(fname) {
 		local buf, fileHandle, line;
@@ -101,7 +98,14 @@ fileToProp: PreinitObject
 		}
 
 		catch(Exception e) {
-			_error('<<fname>>:  File load failed:', e);
+			"<<fname>>:  File load failed: ";
+			if(e) {
+				"\t";
+				e.displayException();
+			} else {
+				"MISSING EXCEPTION";
+			}
+			"\n ";
 		}
 
 		finally {
