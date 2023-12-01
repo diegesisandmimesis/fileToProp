@@ -172,3 +172,9 @@ FileToListString: FileToProp
 		(location).(prop) = v.toList();
 	}
 ;
+
+FileToDString: FileToProp
+	setProperty(data) {
+		location.setMethod(prop, new method() { "<<data>>"; });
+	}
+;

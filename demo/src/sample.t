@@ -26,6 +26,7 @@ versionInfo: GameID;
 gameMain: GameMainDef
 	textString = nil
 	loadedList = nil
+	dstring = nil
 
 	newGame() {
 		"\ntextString:  <<toString(textString)>>\n ";
@@ -38,7 +39,10 @@ gameMain: GameMainDef
 		} else {
 			"NOT LIST\n ";
 		}
+
+		dstring();
 	}
 ;
 +FileToProp 'text.txt' ->(&textString);
 +FileToListInt 'list.txt' ->(&loadedList);
++FileToDString 'dstring.txt' ->(&dstring);
