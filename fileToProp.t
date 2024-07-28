@@ -77,13 +77,17 @@ fileToProp: PreinitObject
 		});
 	}
 
+	getFileHandle(fname) {
+		return(File.openTextFile(FileName.fromUniversal(fname),
+			FileAccessRead, 'utf8'));
+	}
+
 	// Load the given file and return a string containing the contents.
 	fileToString(fname) {
 		local buf, fileHandle, line;
 
 		try {
-			fileHandle = File.openTextFile(fname, FileAccessRead,
-				'utf8');
+			fileHandle = getFileHandle(fname);
 
 			buf = new StringBuffer(fileHandle.getFileSize());
 
@@ -149,9 +153,14 @@ FileToProp: object
 	setProperty(v) { (location).(prop) = v; }
 ;
 
-// Our default behavior is to treat the file contents as a string, so
-// FileToString is just an alias for the base FileToProp class.
-FileToString: FileToProp;
+// When we're explicitly using FileToString we take the additional
+// step of stripping out newlines.
+FileToString: FileToProp
+	setProperty(v) {
+		v = v.split(R'<newline>+').join(' ');
+		(location).(prop) = toString(v);
+	}
+;
 
 // FileToProp subclass that treats the file contents as an array of integers.
 FileToListInt: FileToProp

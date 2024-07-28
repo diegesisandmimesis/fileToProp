@@ -40,7 +40,8 @@ gameMain: GameMainDef
 			"NOT LIST\n ";
 		}
 
-		dstring();
+		//dstring();
+		"<<dstring>>\n ";
 	}
 ;
 +FileToProp 'text.txt' ->(&textString);
